@@ -1,5 +1,7 @@
 # AIT
 
+![CodeSpell](https://github.com/mpiccmos/ait/actions/workflows/codespell.yml/badge.svg)
+
 ## Setup
 
 1. Use specified `npm` version
