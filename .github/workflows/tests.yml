@@ -18,6 +18,11 @@ jobs:
       - name: "Install Dependencies"
         run: npm install
         shell: bash
+      - name: "Setup .env"
+        shell: bash
+        run: |
+          # echo "${{ secrets.SuperSecret }}" >> .env
+          cp dotenv .env
       - name: Run Test Suite
         run: |
           npx hardhat test

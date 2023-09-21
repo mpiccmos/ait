@@ -1,5 +1,6 @@
 # AIT
 
+![UnitTests](https://github.com/mpiccmos/ait/actions/workflows/tests.yml/badge.svg)
 ![CodeSpell](https://github.com/mpiccmos/ait/actions/workflows/codespell.yml/badge.svg)
 
 ## Setup
