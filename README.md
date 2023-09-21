@@ -3,6 +3,8 @@
 ![UnitTests](https://github.com/mpiccmos/ait/actions/workflows/tests.yml/badge.svg)
 ![CodeSpell](https://github.com/mpiccmos/ait/actions/workflows/codespell.yml/badge.svg)
 
+[Unit test coverage report](https://mpiccmos.github.io/ait/)
+
 ## Setup
 
 1. Use specified `npm` version
