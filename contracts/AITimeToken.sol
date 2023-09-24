@@ -17,6 +17,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
 
     uint256 public annualRoundsCap;
     uint256 public annualCap;
+    uint256 private _annualBaseCap;
     uint256 private _thisYear;
     uint256 private _mintedThisYear;
     uint256 private _roundsThisYear;
@@ -53,6 +54,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     function _updateAnnualIssuanceRecords(uint256 amount) private {
         uint256 new_year = _getThisYear();
         if (new_year > _thisYear) {
+            annualCap += _annualBaseCap;  // rollover previous years' unused cap
             _thisYear = new_year;
             _mintedThisYear = 0;
             _roundsThisYear = 0;
@@ -138,11 +140,12 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     */
     function initialize() public initializer {
         __ERC20_init("AI Time Token", "AIT");
-        __ERC20Capped_init(fromYears(100) * 80 * 10**decimals());
+        __ERC20Capped_init(fromYears(99) * 25 * 10**decimals());
         __Pausable_init();
         __Ownable_init();
-        annualCap = fromYears(1) * 80 * 10**decimals();
         annualRoundsCap = 4;
+        _annualBaseCap = fromYears(1) * 25 * 10**decimals();
+        annualCap = _annualBaseCap;
         _thisYear = _getThisYear();
         _mintedThisYear = 0;
     }
