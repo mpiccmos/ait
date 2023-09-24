@@ -6,8 +6,8 @@ require("hardhat-gas-reporter");
 require("dotenv").config({ path: ".env" });
 
 const SEPOLIA_ALCHEMY_API_KEY_URL = process.env.SEPOLIA_ALCHEMY_API_KEY_URL;
-const GOERLI_ALCHEMY_API_KEY_URL = process.env.SEPOLIA_ALCHEMY_API_KEY_URL;
-const MAINNET_ALCHEMY_API_KEY_URL = process.env.SEPOLIA_ALCHEMY_API_KEY_URL;
+const GOERLI_ALCHEMY_API_KEY_URL = process.env.GOERLI_ALCHEMY_API_KEY_URL;
+const MAINNET_ALCHEMY_API_KEY_URL = process.env.MAINNET_ALCHEMY_API_KEY_URL;
 const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 
@@ -38,6 +38,7 @@ module.exports = {
     etherscan: {
         apiKey: {
             sepolia: ETHERSCAN_API_KEY,
+            goerli: ETHERSCAN_API_KEY,
         }
     },
     gasReporter: {

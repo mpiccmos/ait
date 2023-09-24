@@ -20,7 +20,7 @@ describe("Treasury", function () {
         await ait.mint(MINT_AMOUNT);
         await ait.transfer(treasury_addr, MINT_AMOUNT);
 
-        return { ait, treasury, owner, otherAccount };
+        return { ait, treasury, MINT_AMOUNT, owner, otherAccount };
     }
 
     describe("Deployment", function () {
@@ -29,9 +29,31 @@ describe("Treasury", function () {
             expect(await treasury.beneficiary()).to.equal(owner.address);
         });
 
-        it("Should set the unlock to be 366 days later", async function () {
-            const { treasury } = await loadFixture(deployTreasuryFixture);
+        it("Should set the right timelock", async function () {
+            const { treasury, owner } = await loadFixture(deployTreasuryFixture);
+            expect(await treasury.beneficiary()).to.equal(owner.address);
         });
+
+        it("Should lock the funds until 366 days", async function () {
+            const { treasury } = await loadFixture(deployTreasuryFixture);
+            expect(await treasury.releasableAIT()).to.equal(0);
+
+            await time.increase(3600 * 24 * 366 - 60);  // advance to just before 366 days
+            expect(await treasury.releasableAIT()).to.equal(0);
+        });
+
+        it("Should unlock the funds after 366 days", async function () {
+            const { treasury, MINT_AMOUNT } = await loadFixture(deployTreasuryFixture);
+            expect(await treasury.releasableAIT()).to.equal(0);
+
+            await time.increase(3600 * 24 * 366 + 60);  // advance to just after 366 days
+            expect(await treasury.releasableAIT()).to.equal(MINT_AMOUNT);
+        });
+    });
+
+    describe("Release", function () {
+
+
     });
 
 });
