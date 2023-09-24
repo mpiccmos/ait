@@ -103,16 +103,16 @@ slither .
 
 ### Test Checklist
 
-- [ ] Ensure that the code comes with an extensive test suite. Tests help to express your
+- [x] Ensure that the code comes with an extensive test suite. Tests help to express your
 intent and to assure code quality.
 - [x] Provide step-by-step instructions for running the test suite. Include any necessary
   information related to the setup and environment.
-- [ ] Have tests for all "happy path" user stories. All tests should be passing.
-- [ ] Test access controls and paths for all the roles, such as owners and non-owners.
-- [ ] Write negative tests. E.g., if users should NOT be able to withdraw within 100 blocks of
+- [x] Have tests for all "happy path" user stories. All tests should be passing.
+- [x] Test access controls and paths for all the roles, such as owners and non-owners.
+- [x] Write negative tests. E.g., if users should NOT be able to withdraw within 100 blocks of
   depositing, then write a test where a user tries to withdraw early and make sure the
   user's attempt fails.
-- [ ] Measure test coverage (e.g., with solidity-coverage for Solidity). A good rule of thumb is
+- [x] Measure test coverage (e.g., with solidity-coverage for Solidity). A good rule of thumb is
   to ensure at least 80% coverage in each category (statements, functions, branches).
   Note, however, that optimizing for 100% coverage does not automatically imply a high
   quality test suite.
@@ -123,7 +123,7 @@ integration points are tested.
 
 - [ ] Identify the target date of audit completion and any reasons for such timing (e.g.,
   commitment to investors).
-- [ ] Provide the location of your source code (e.g., GitHub) with the commit hash to be
+- [x] Provide the location of your source code (e.g., GitHub) with the commit hash to be
   audited and make sure they are accessible to the auditors.
 - [ ] Indicate if the code is currently deemed production-ready by the company. Have all
   previous reviews been considered and fixes implemented?
