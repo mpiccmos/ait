@@ -11,10 +11,6 @@ describe("AITimeToken", function () {
 
         const AITimeToken = await ethers.getContractFactory("AITimeToken");
         const ait = await upgrades.deployProxy(AITimeToken, []);
-        console.log("AIT Proxy Address:", await ait.getAddress());
-
-        // const AITimeTokenV2Dummy = await ethers.getContractFactory("AITimeToken");
-        // const ait_upgraded = await upgrades.upgradeProxy(await ait.getAddress(), AITimeTokenV2Dummy);
 
         return { ait, owner, otherAccount, tokenURI };
     }
@@ -65,6 +61,7 @@ describe("AITimeToken", function () {
             const mintAmount = await ait.getAnnualMintQuota();
             const mintTX = await ait.mint(mintAmount);
             await mintTX.wait();
+            expect(await ait.totalSupply()).to.equal(mintAmount);
         });
 
         it("Should not allow minting beyond annual cap", async function () {
@@ -152,6 +149,53 @@ describe("AITimeToken", function () {
             expect(await ait.fromHours(mm)).to.equal(sss);
         });
 
+        it("Should correctly convert to/from days", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const m = 123;
+            const s = m * 86400;
+            expect(await ait.toDays(s)).to.equal(m);
+
+            const ss = 91742;
+            const mm = Math.floor(ss / 86400);
+            const sss = mm * 86400
+            expect(await ait.fromDays(mm)).to.equal(sss);
+        });
+
+        it("Should correctly convert to/from years", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const m = 123;
+            const s = m * 31536000;
+            expect(await ait.toYears(s)).to.equal(m);
+
+            const ss = 9174234234;
+            const mm = Math.floor(ss / 31536000);
+            const sss = mm * 31536000
+            expect(await ait.fromYears(mm)).to.equal(sss);
+        });
+
+        it("Should correctly convert to/from decades", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const m = 123;
+            const s = m * 315360000;
+            expect(await ait.toDecades(s)).to.equal(m);
+
+            const ss = 9174234234;
+            const mm = Math.floor(ss / 315360000);
+            const sss = mm * 315360000
+            expect(await ait.fromDecades(mm)).to.equal(sss);
+        });
+
+        it("Should correctly convert to/from centuries", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const m = 123;
+            const s = m * 3153600000;
+            expect(await ait.toCenturies(s)).to.equal(m);
+
+            const ss = 9174234232134;
+            const mm = Math.floor(ss / 3153600000);
+            const sss = mm * 3153600000
+            expect(await ait.fromCenturies(mm)).to.equal(sss);
+        });
     });
 
     describe("Ethers", function () {
@@ -165,15 +209,114 @@ describe("AITimeToken", function () {
             expect(await ethers.provider.getBalance(ait_addr)).to.equal(ethers.parseEther("1"));
         });
 
-
-        it("Should let owner withdral ethers", async function () {
+        it("Should be able to receive ethers via fallback()", async function () {
             const { ait, otherAccount } = await loadFixture(deployAITFixture);
             const ait_addr = await ait.getAddress();
             const txHash = await otherAccount.sendTransaction({
                 to: ait_addr,
                 value: ethers.toQuantity(ethers.parseEther("1")), // 1 ether,
+                data: "0x00"
             });
             expect(await ethers.provider.getBalance(ait_addr)).to.equal(ethers.parseEther("1"));
+        });
+
+        it("Should let owner withdraw ethers to specified address", async function () {
+            const { ait, owner, otherAccount } = await loadFixture(deployAITFixture);
+            const ait_addr = await ait.getAddress();
+            await otherAccount.sendTransaction({
+                to: ait_addr,
+                value: ethers.toQuantity(ethers.parseEther("1")), // 1 ether,
+            });
+            expect(await ethers.provider.getBalance(ait_addr)).to.equal(ethers.parseEther("1"));
+            const owner_bal = await ethers.provider.getBalance(owner);
+            const withdrawTxHash = (await ait.withdraw(owner, ethers.parseEther("1"))).hash;
+            const withdrawTxReceipt = await ethers.provider.getTransactionReceipt(withdrawTxHash);
+            expect(await ethers.provider.getBalance(ait_addr)).to.equal(0);
+            expect(await ethers.provider.getBalance(owner)).to.equal(
+                owner_bal + ethers.parseEther("1") - withdrawTxReceipt.gasUsed * withdrawTxReceipt.gasPrice);
+        });
+
+        it("Should not let non-owner withdraw ethers", async function () {
+            const { ait, otherAccount } = await loadFixture(deployAITFixture);
+            const ait_addr = await ait.getAddress();
+            await otherAccount.sendTransaction({
+                to: ait_addr,
+                value: ethers.toQuantity(ethers.parseEther("1")), // 1 ether,
+            });
+            expect(await ethers.provider.getBalance(ait_addr)).to.equal(ethers.parseEther("1"));
+            await expect(
+                ait.connect(otherAccount).withdraw(otherAccount, ethers.parseEther("1"))
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+    });
+
+    describe("Management", function () {
+        it("Should start unpaused", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            expect(await ait.paused()).to.equal(false);
+        });
+
+        it("Should let owner to pause transfers", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const pauseTx = await ait.pause();
+            await pauseTx.wait();
+            expect(await ait.paused()).to.equal(true);
+        });
+
+        it("Should not let non-owner to pause transfers", async function () {
+            const { ait, otherAccount } = await loadFixture(deployAITFixture);
+            await expect(
+                ait.connect(otherAccount).pause()
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
+        it("Should let owner to unpause transfers", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const pauseTx = await ait.pause();
+            await pauseTx.wait();
+            expect(await ait.paused()).to.equal(true);
+            const unpauseTx = await ait.unpause();
+            await unpauseTx.wait();
+            expect(await ait.paused()).to.equal(false);
+        });
+
+        it("Should not let non-owner to unpause transfers", async function () {
+            const { ait, otherAccount } = await loadFixture(deployAITFixture);
+            const pauseTx = await ait.pause();
+            await pauseTx.wait();
+            expect(await ait.paused()).to.equal(true);
+            await expect(
+                ait.connect(otherAccount).unpause()
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
+        it("Should allow transfers when not paused", async function () {
+            const { ait, owner, otherAccount } = await loadFixture(deployAITFixture);
+            const mintAmount = 100;
+            const mintTx = await ait.mint(mintAmount);
+            await mintTx.wait();
+            expect(await ait.balanceOf(owner)).to.equal(mintAmount);
+            expect(await ait.balanceOf(otherAccount)).to.equal(0);
+            expect(await ait.paused()).to.equal(false);
+            const transferTx = await ait.transfer(otherAccount, mintAmount);
+            await transferTx.wait();
+            expect(await ait.balanceOf(owner)).to.equal(0);
+            expect(await ait.balanceOf(otherAccount)).to.equal(mintAmount);
+        });
+
+        it("Should not allow transfers when paused", async function () {
+            const { ait, owner, otherAccount } = await loadFixture(deployAITFixture);
+            const mintAmount = 100;
+            const mintTx = await ait.mint(mintAmount);
+            await mintTx.wait();
+            const pauseTx = await ait.pause();
+            await pauseTx.wait();
+            expect(await ait.balanceOf(owner)).to.equal(mintAmount);
+            expect(await ait.balanceOf(otherAccount)).to.equal(0);
+            expect(await ait.paused()).to.equal(true);
+            await expect(
+                ait.transfer(otherAccount, mintAmount)
+            ).to.be.revertedWith("Pausable: paused");
         });
     });
 });

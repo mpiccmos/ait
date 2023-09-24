@@ -188,7 +188,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     * @dev Besides
     * mint logic is TBD
     */
-    function mint(uint256 amount) external onlyOwner whenNotPaused {
+    function mint(uint256 amount) external onlyOwner {
         _updateAnnualIssuanceRecords(amount);
         _mint(msg.sender, amount);
     }
