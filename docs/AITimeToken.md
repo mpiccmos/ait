@@ -187,7 +187,7 @@ _How many rounds of minting left this year._
 ### mint
 
 ```solidity
-function mint(uint256 amount) external payable
+function mint(uint256 amount) external
 ```
 
 _Besides
