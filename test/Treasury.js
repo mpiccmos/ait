@@ -53,6 +53,21 @@ describe("Treasury", function () {
 
     describe("Release", function () {
 
+        it("Should release the funds if owner calls releaseAIT() after 366 days", async function () {
+            const { ait, owner, treasury, MINT_AMOUNT } = await loadFixture(deployTreasuryFixture);
+            await time.increase(3600 * 24 * 366 + 60);  // advance to just after 366 days
+            expect(await ait.balanceOf(owner.address)).to.equal(0);
+            await treasury.releaseAIT();
+            expect(await ait.balanceOf(owner.address)).to.equal(MINT_AMOUNT);
+        });
+
+        it("Should release the funds to beneficiary if non-owner calls releaseAIT() after 366 days", async function () {
+            const { ait, owner, treasury, otherAccount, MINT_AMOUNT } = await loadFixture(deployTreasuryFixture);
+            await time.increase(3600 * 24 * 366 + 60);  // advance to just after 366 days
+            expect(await ait.balanceOf(owner.address)).to.equal(0);
+            await treasury.connect(otherAccount).releaseAIT();
+            expect(await ait.balanceOf(owner.address)).to.equal(MINT_AMOUNT);
+        });
 
     });
 

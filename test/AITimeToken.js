@@ -11,6 +11,7 @@ describe("AITimeToken", function () {
 
         const AITimeToken = await ethers.getContractFactory("AITimeToken");
         const ait = await upgrades.deployProxy(AITimeToken, []);
+        console.log("AIT Proxy Address:", await ait.getAddress());
 
         // const AITimeTokenV2Dummy = await ethers.getContractFactory("AITimeToken");
         // const ait_upgraded = await upgrades.upgradeProxy(await ait.getAddress(), AITimeTokenV2Dummy);
@@ -124,6 +125,55 @@ describe("AITimeToken", function () {
                 ait.connect(otherAccount).setTokenURI(tokenURI)
             ).to.be.revertedWith("Ownable: caller is not the owner");
         });
+    });
 
+    describe("Unit conversions", function () {
+        it("Should correctly convert to/from minutes", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const m = 123;
+            const s = m * 60;
+            expect(await ait.toMinutes(s)).to.equal(m);
+
+            const ss = 91742;
+            const mm = Math.floor(ss / 60);
+            const sss = mm * 60
+            expect(await ait.fromMinutes(mm)).to.equal(sss);
+        });
+
+        it("Should correctly convert to/from hours", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const m = 123;
+            const s = m * 3600;
+            expect(await ait.toHours(s)).to.equal(m);
+
+            const ss = 91742;
+            const mm = Math.floor(ss / 3600);
+            const sss = mm * 3600
+            expect(await ait.fromHours(mm)).to.equal(sss);
+        });
+
+    });
+
+    describe("Ethers", function () {
+        it("Should be able to receive ethers", async function () {
+            const { ait, otherAccount } = await loadFixture(deployAITFixture);
+            const ait_addr = await ait.getAddress();
+            const txHash = await otherAccount.sendTransaction({
+                to: ait_addr,
+                value: ethers.toQuantity(ethers.parseEther("1")), // 1 ether,
+            });
+            expect(await ethers.provider.getBalance(ait_addr)).to.equal(ethers.parseEther("1"));
+        });
+
+
+        it("Should let owner withdral ethers", async function () {
+            const { ait, otherAccount } = await loadFixture(deployAITFixture);
+            const ait_addr = await ait.getAddress();
+            const txHash = await otherAccount.sendTransaction({
+                to: ait_addr,
+                value: ethers.toQuantity(ethers.parseEther("1")), // 1 ether,
+            });
+            expect(await ethers.provider.getBalance(ait_addr)).to.equal(ethers.parseEther("1"));
+        });
     });
 });
