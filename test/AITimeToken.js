@@ -7,6 +7,7 @@ describe("AITimeToken", function () {
     async function deployAITFixture() {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await ethers.getSigners();
+        const tokenURI = "https://raw.githubusercontent.com/mpiccmos/ait/main/metadata.json";
 
         const AITimeToken = await ethers.getContractFactory("AITimeToken");
         const ait = await upgrades.deployProxy(AITimeToken, []);
@@ -14,7 +15,7 @@ describe("AITimeToken", function () {
         // const AITimeTokenV2Dummy = await ethers.getContractFactory("AITimeToken");
         // const ait_upgraded = await upgrades.upgradeProxy(await ait.getAddress(), AITimeTokenV2Dummy);
 
-        return { ait, owner, otherAccount };
+        return { ait, owner, otherAccount, tokenURI };
     }
 
     async function upgradeAITFixture() {
@@ -102,5 +103,27 @@ describe("AITimeToken", function () {
                 ait.mint(mintAmount)
             ).to.be.revertedWithCustomError(ait, "ERC20ExceededAnnualRoundsCap");
         });
+    });
+
+    describe("ERC-1046 tokenURI", function () {
+        it("Should not set a tokenURI by default", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            expect(await ait.tokenURI()).to.equal("");
+        });
+
+        it("Should let the owner set tokenURI", async function () {
+            const { ait, tokenURI } = await loadFixture(deployAITFixture);
+            await ait.setTokenURI(tokenURI);
+            expect(await ait.tokenURI()).to.equal(tokenURI);
+        });
+
+        it("Should not let non-owner set tokenURI", async function () {
+            const { ait, otherAccount, tokenURI } = await loadFixture(deployAITFixture);
+            await ait.setTokenURI(tokenURI);
+            await expect(
+                ait.connect(otherAccount).setTokenURI(tokenURI)
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
     });
 });
