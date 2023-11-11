@@ -35,6 +35,22 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     */
     event NewYearStarted(uint256 year, uint256 cap);
 
+    /**
+    * @dev Emitted when tokenURI is set.
+    */
+    event TokenURIUpdated(string uri);
+
+    /**
+    * @dev Emitted when ETH is withdrawn from the contract.
+    */
+    event ETHWithdrawn();
+
+    /**
+    * @dev Emitted when annual issuance records are updated.
+    */
+    event AnnualIssuanceRecordsUpdated(
+        uint256 minted_this_year, uint256 rounds_this_year, uint256 cap_left_this_year);
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Private methods
 
@@ -77,6 +93,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
         _mintedThisYear += amount;
         _roundsThisYear += 1;
         annualCap -= amount;
+        emit AnnualIssuanceRecordsUpdated(_mintedThisYear, _roundsThisYear, annualCap);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
@@ -179,6 +196,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     */
     function setTokenURI(string memory uri) external onlyOwner {
         _tokenURI = uri;
+        emit TokenURIUpdated(_tokenURI);
     }
 
     /**
@@ -236,6 +254,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
         require(amount > 0, "Withdraw amount should be positive");
         (bool succeed, ) = recipient.call{value: amount}("");
         require(succeed, "Failed to withdraw Ether");
+        emit ETHWithdrawn();
     }
 
     /**
