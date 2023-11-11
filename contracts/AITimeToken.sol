@@ -193,6 +193,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     * mint logic is TBD
     */
     function mint(uint256 amount) external onlyOwner {
+        require(amount > 0, "Mind amount should be positive");
         _updateAnnualIssuanceRecords(amount);
         _mint(msg.sender, amount);
     }
@@ -215,6 +216,8 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     * @dev Function to withdraw ether
     */
     function withdraw(address payable recipient, uint256 amount) external onlyOwner {
+        require(recipient != address(0), "Recipient address should not be a zero address");
+        require(amount > 0, "Withdraw amount should be positive");
         (bool succeed, ) = recipient.call{value: amount}("");
         require(succeed, "Failed to withdraw Ether");
     }
