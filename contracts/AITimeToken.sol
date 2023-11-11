@@ -43,7 +43,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     /**
     * @dev Emitted when ETH is withdrawn from the contract.
     */
-    event ETHWithdrawn();
+    event ETHWithdrawn(address recipient, uint256 withdraw_amount);
 
     /**
     * @dev Emitted when annual issuance records are updated.
@@ -162,7 +162,8 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     }
 
     /**
-    * @dev Supply capped at 800 billion people-years: 8 billion people * 100 years
+    * @dev Supply capped at the number of sections in 99 years times 25, to be
+    * issued over no less than 99 years.
     */
     function initialize() public initializer {
         __ERC20_init("AI Time Token", "AIT");
@@ -201,6 +202,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
 
     /**
     * @dev How many mintable seconds left this year.
+    * @return the max amount of mintable AIT for the current year.
     */
     function getAnnualMintQuota() external view returns (uint256) {
         uint256 left = annualCap - _mintedThisYear;
@@ -212,6 +214,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
 
     /**
     * @dev How many rounds of minting left this year.
+    * @return the max number of rounds of minting left for the current year.
     */
     function getAnnualRoundsQuota() external view returns (uint256) {
         if (_newYearStarted()) {
@@ -223,8 +226,8 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     }
 
     /**
-    * @dev Besides
-    * mint logic is TBD
+    * @dev The owner has the sole authority to mint.
+    * @param amount The mint amount
     */
     function mint(uint256 amount) external onlyOwner {
         require(amount > 0, "Mind amount should be positive");
@@ -233,7 +236,8 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     }
 
     /**
-    * @dev Function to pause all mint and transfers
+    * @dev The owner has the authority to pause all mint and transfers for, e.g.,
+    * legal and regulatory compliance reasons.
     */
     function pause() external onlyOwner {
         _pause();
@@ -248,13 +252,15 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
 
     /**
     * @dev Function to withdraw ether
+    * @param recipient Address to withdraw to
+    * @param amount Amount of ether to withdraw
     */
     function withdraw(address payable recipient, uint256 amount) external onlyOwner {
         require(recipient != address(0), "Recipient address should not be a zero address");
         require(amount > 0, "Withdraw amount should be positive");
         (bool succeed, ) = recipient.call{value: amount}("");
         require(succeed, "Failed to withdraw Ether");
-        emit ETHWithdrawn();
+        emit ETHWithdrawn(recipient, amount);
     }
 
     /**

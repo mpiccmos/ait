@@ -5,6 +5,12 @@
 
 [Unit test coverage report](https://mpiccmos.github.io/ait/)
 
+**IMPORTANT**: AIT is an experimental utility token used to measure time value of its community members.
+Its power of control is highly centralized. The issuer has the sole authority to mint, pause/unpause, and upgrade contracts at any time.
+This is a deliberate design based on regulatory and legal considerations. Albeit being centrally issued and managed, AIT can
+be circulated and traded freely, and all the activities are transparent on-chain. There is plan to gradually move towards decentralization,
+but until then, the user has to trust the issuer to do the right thing. Please refer to the whitepaper after launch for more details.
+
 ## Setup
 
 1. Use specified `npm` version
