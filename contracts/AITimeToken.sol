@@ -68,6 +68,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
         }
         _mintedThisYear += amount;
         _roundsThisYear += 1;
+        annualCap -= amount;
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal whenNotPaused override {
