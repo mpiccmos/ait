@@ -48,12 +48,20 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     }
 
     /**
+    * @dev Check whether a new year has started
+    */
+    function _newYearStarted() private view returns (bool) {
+        uint256 new_year = _getThisYear();
+        return (new_year > _thisYear);
+    }
+
+    /**
     * @dev Update annual issuance records. We record every mint instead of overriding cap()
     * because the latter allows minting more by burning some.
     */
     function _updateAnnualIssuanceRecords(uint256 amount) private {
-        uint256 new_year = _getThisYear();
-        if (new_year > _thisYear) {
+        if (_newYearStarted()) {
+            uint256 new_year = _getThisYear();
             annualCap += _annualBaseCap;  // rollover previous years' unused cap
             _thisYear = new_year;
             _mintedThisYear = 0;
@@ -178,6 +186,9 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     */
     function getAnnualMintQuota() external view returns (uint256) {
         uint256 left = annualCap - _mintedThisYear;
+        if (_newYearStarted()) {
+            left += _annualBaseCap;
+        }
         return (left <= cap()) ? left : cap();
     }
 
@@ -185,7 +196,12 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     * @dev How many rounds of minting left this year.
     */
     function getAnnualRoundsQuota() external view returns (uint256) {
-        return annualRoundsCap - _roundsThisYear;
+        if (_newYearStarted()) {
+            return annualRoundsCap;
+        }
+        else {
+            return annualRoundsCap - _roundsThisYear;
+        }
     }
 
     /**
