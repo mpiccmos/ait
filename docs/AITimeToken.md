@@ -36,6 +36,30 @@ event NewYearStarted(uint256 year, uint256 cap)
 
 _Emitted when a new financial year starts, resetting annual issuance cap._
 
+### TokenURIUpdated
+
+```solidity
+event TokenURIUpdated(string uri)
+```
+
+_Emitted when tokenURI is set._
+
+### ETHWithdrawn
+
+```solidity
+event ETHWithdrawn(address recipient, uint256 withdraw_amount)
+```
+
+_Emitted when ETH is withdrawn from the contract._
+
+### AnnualIssuanceRecordsUpdated
+
+```solidity
+event AnnualIssuanceRecordsUpdated(uint256 minted_this_year, uint256 rounds_this_year, uint256 cap_left_this_year)
+```
+
+_Emitted when annual issuance records are updated._
+
 ### _beforeTokenTransfer
 
 ```solidity
@@ -141,7 +165,8 @@ constructor() public
 function initialize() public
 ```
 
-_Supply capped at 800 billion people-years: 8 billion people * 100 years_
+_Supply capped at the number of sections in 99 years times 25, to be
+issued over no less than 99 years._
 
 ### decimals
 
@@ -176,6 +201,12 @@ function getAnnualMintQuota() external view returns (uint256)
 
 _How many mintable seconds left this year._
 
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | the max amount of mintable AIT for the current year. |
+
 ### getAnnualRoundsQuota
 
 ```solidity
@@ -184,14 +215,25 @@ function getAnnualRoundsQuota() external view returns (uint256)
 
 _How many rounds of minting left this year._
 
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | the max number of rounds of minting left for the current year. |
+
 ### mint
 
 ```solidity
 function mint(uint256 amount) external
 ```
 
-_Besides
-mint logic is TBD_
+_The owner has the sole authority to mint._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | The mint amount |
 
 ### pause
 
@@ -199,7 +241,8 @@ mint logic is TBD_
 function pause() external
 ```
 
-_Function to pause all mint and transfers_
+_The owner has the authority to pause all mint and transfers for, e.g.,
+legal and regulatory compliance reasons._
 
 ### unpause
 
@@ -216,6 +259,13 @@ function withdraw(address payable recipient, uint256 amount) external
 ```
 
 _Function to withdraw ether_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| recipient | address payable | Address to withdraw to |
+| amount | uint256 | Amount of ether to withdraw |
 
 ### receive
 
