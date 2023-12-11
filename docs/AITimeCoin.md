@@ -1,6 +1,6 @@
 # Solidity API
 
-## AITimeToken
+## AITimeCoin
 
 ### annualRoundsCap
 

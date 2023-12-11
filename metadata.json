@@ -2,10 +2,10 @@
   "interop": {
     "erc1046": true
   },
-  "name": "AI Time Token",
+  "name": "AI Time Coin",
   "symbol": "AIT",
   "decimals": 9,
-  "description": "AI Time Token (AIT) is an ERC-20 token.",
+  "description": "AI Time Coin (AIT) is an ERC-20 token.",
   "image": "https://example.com/sampletoken_image.jpg",
   "images": [
     "https://example.com/sampletoken_image1.jpg",

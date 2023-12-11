@@ -2,15 +2,15 @@ const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helper
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
 const { expect } = require("chai");
 
-describe("AITimeToken", function () {
+describe("AITimeCoin", function () {
 
     async function deployAITFixture() {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await ethers.getSigners();
         const tokenURI = "https://raw.githubusercontent.com/mpiccmos/ait/main/metadata.json";
 
-        const AITimeToken = await ethers.getContractFactory("AITimeToken");
-        const ait = await upgrades.deployProxy(AITimeToken, []);
+        const AITimeCoin = await ethers.getContractFactory("AITimeCoin");
+        const ait = await upgrades.deployProxy(AITimeCoin, []);
 
         return { ait, owner, otherAccount, tokenURI };
     }
@@ -19,10 +19,10 @@ describe("AITimeToken", function () {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await ethers.getSigners();
 
-        const AITimeToken = await ethers.getContractFactory("AITimeToken");
-        const AITimeTokenV2Dummy = await ethers.getContractFactory("AITimeToken");
-        const ait_v1 = await upgrades.deployProxy(AITimeToken, []);
-        const ait_v2 = await upgrades.upgradeProxy(await ait.getAddress(), AITimeTokenV2Dummy);
+        const AITimeCoin = await ethers.getContractFactory("AITimeCoin");
+        const AITimeCoinV2Dummy = await ethers.getContractFactory("AITimeCoin");
+        const ait_v1 = await upgrades.deployProxy(AITimeCoin, []);
+        const ait_v2 = await upgrades.upgradeProxy(await ait.getAddress(), AITimeCoinV2Dummy);
 
         return { ait_v1, ait_v2, owner, otherAccount };
     }

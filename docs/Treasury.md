@@ -14,7 +14,7 @@ address ait
 ### constructor
 
 ```solidity
-constructor(address beneficiaryAddress, address aITimeTokenAddress) public payable
+constructor(address beneficiaryAddress, address aITimeCoinAddress) public payable
 ```
 
 _Use as timelock by setting duration to 0_

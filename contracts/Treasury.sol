@@ -13,11 +13,11 @@ contract Treasury is VestingWallet {
     /**
      * @dev Use as timelock by setting duration to 0
      */
-    constructor(address beneficiaryAddress, address aITimeTokenAddress) VestingWallet(
+    constructor(address beneficiaryAddress, address aITimeCoinAddress) VestingWallet(
         beneficiaryAddress, uint64(block.timestamp + (366 days)), uint64(0)) payable {
         require(beneficiaryAddress != address(0), "Beneficiary address should not be a zero address");
-        require(aITimeTokenAddress != address(0), "AIT address should not be a zero address");
-        ait = aITimeTokenAddress;
+        require(aITimeCoinAddress != address(0), "AIT address should not be a zero address");
+        ait = aITimeCoinAddress;
     }
 
     /**

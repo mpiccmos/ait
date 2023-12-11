@@ -16,15 +16,15 @@ async function main() {
     }
     console.log("Using safe address:", SAFE_ADDRESS);
 
-    const aITimeTokenContract = await ethers.getContractFactory("AITimeToken");
-    const deployedAITimeTokenContract = await upgrades.deployProxy(
-        aITimeTokenContract, [], {
+    const aITimeCoinContract = await ethers.getContractFactory("AITimeCoin");
+    const deployedAITimeCoinContract = await upgrades.deployProxy(
+        aITimeCoinContract, [], {
             initializer: "initialize",
             kind: "transparent",
         });
-    await deployedAITimeTokenContract.waitForDeployment();
-    const aitAddr = await deployedAITimeTokenContract.getAddress();
-    console.log("AI Time Token Contract Address:", aitAddr);
+    await deployedAITimeCoinContract.waitForDeployment();
+    const aitAddr = await deployedAITimeCoinContract.getAddress();
+    console.log("AI Time Coin Contract Address:", aitAddr);
 
     const treasuryContract = await ethers.getContractFactory("Treasury");
     const deployedTreasuryContract = await treasuryContract.deploy(

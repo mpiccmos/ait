@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeable, OwnableUpgradeable {
+contract AITimeCoin is Initializable, ERC20CappedUpgradeable, PausableUpgradeable, OwnableUpgradeable {
 
     uint256 private constant _secondsInMinute  = 60;
     uint256 private constant _minutesInHour    = 60;
@@ -165,7 +165,7 @@ contract AITimeToken is Initializable, ERC20CappedUpgradeable, PausableUpgradeab
     * issued over no less than 99 years.
     */
     function initialize() public initializer {
-        __ERC20_init("AI Time Token", "AIT");
+        __ERC20_init("AI Time Coin", "AIT");
         __ERC20Capped_init(fromYears(99) * 25 * 10**decimals());
         __Pausable_init();
         __Ownable_init();

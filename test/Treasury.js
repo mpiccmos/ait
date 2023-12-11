@@ -8,8 +8,8 @@ describe("Treasury", function () {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await ethers.getSigners();
 
-        const AITimeToken = await ethers.getContractFactory("AITimeToken");
-        const ait = await upgrades.deployProxy(AITimeToken, []);
+        const AITimeCoin = await ethers.getContractFactory("AITimeCoin");
+        const ait = await upgrades.deployProxy(AITimeCoin, []);
         const ait_addr = await ait.getAddress();
 
         const treasuryContract = await ethers.getContractFactory("Treasury");
