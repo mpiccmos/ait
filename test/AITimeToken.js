@@ -64,6 +64,29 @@ describe("AITimeToken", function () {
             expect(await ait.totalSupply()).to.equal(mintAmount);
         });
 
+        it("Should calculate mint quota correctly", async function () {
+            const { ait } = await loadFixture(deployAITFixture);
+            const cap = await ait.getAnnualMintQuota();
+            const mintTX = await ait.mint(4242);
+            await mintTX.wait();
+            expect(await ait.getAnnualMintQuota()).to.equal(cap - BigInt(4242));
+
+            await time.increase(3600 * 24 * 370);  // advance 370 days
+            const annualBaseCap = (await ait.fromYears(1)) * BigInt(25) * BigInt(10)**(await ait.decimals());
+            expect(await ait.getAnnualMintQuota()).to.equal(cap - BigInt(4242) + BigInt(annualBaseCap));
+
+            await time.increase(3600 * 24 * 365 * 10);  // advance 3650 days
+            expect(await ait.getAnnualMintQuota()).to.equal(cap - BigInt(4242) + BigInt(annualBaseCap) * BigInt(11));
+
+            const mintTX2 = await ait.mint(4242);
+            await mintTX2.wait();
+            expect(await ait.getAnnualMintQuota()).to.equal(cap - BigInt(4242 * 2) + BigInt(annualBaseCap) * BigInt(11));
+            expect(await ait.annualCap()).to.equal(cap - BigInt(4242) + BigInt(annualBaseCap) * BigInt(11));
+
+            await time.increase(3600 * 24 * 370);
+            expect(await ait.getAnnualMintQuota()).to.equal(cap - BigInt(4242 * 2) + BigInt(annualBaseCap) * BigInt(12));
+        });
+
         it("Should not allow minting beyond annual cap", async function () {
             const { ait } = await loadFixture(deployAITFixture);
             const mintAmount = await ait.getAnnualMintQuota();
