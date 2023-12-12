@@ -78,7 +78,8 @@ contract AITimeCoin is Initializable, ERC20CappedUpgradeable, PausableUpgradeabl
     function _updateAnnualIssuanceRecords(uint256 amount) private {
         if (_newYearStarted()) {
             uint256 new_year = _getThisYear();
-            annualCap += _annualBaseCap * (new_year - _thisYear) - _mintedThisYear;  // rollover previous years' unused cap
+            annualCap += _annualBaseCap * (new_year - _thisYear);  // rollover previous years' unused cap
+            annualCap -= _mintedThisYear;
             _thisYear = new_year;
             _mintedThisYear = 0;
             _roundsThisYear = 0;
